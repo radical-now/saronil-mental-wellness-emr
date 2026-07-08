@@ -382,16 +382,16 @@ const INITIAL_STATE = {
   ],
 
   queue: [
-    { id: "q-1", token: "T01", patientId: "pat-1", apptType: "New Consultation", time: "09:00 AM", assessmentStatus: "Done", status: "Waiting" },
-    { id: "q-2", token: "T02", patientId: "pat-2", apptType: "Follow-up", time: "09:30 AM", assessmentStatus: "Done", status: "Waiting" },
-    { id: "q-3", token: "T03", patientId: "pat-3", apptType: "Follow-up", time: "10:00 AM", assessmentStatus: "Done", status: "Waiting" },
-    { id: "q-4", token: "T04", patientId: "pat-4", apptType: "New Consultation", time: "10:30 AM", assessmentStatus: "Done", status: "Completed" },
-    { id: "q-5", token: "T05", patientId: "pat-5", apptType: "Follow-up", time: "11:00 AM", assessmentStatus: "None", status: "Scheduled" },
-    { id: "q-6", token: "T06", patientId: "pat-6", apptType: "Follow-up", time: "11:30 AM", assessmentStatus: "Done", status: "Completed" },
-    { id: "q-7", token: "T07", patientId: "pat-7", apptType: "Follow-up", time: "12:00 PM", assessmentStatus: "None", status: "Scheduled" },
-    { id: "q-8", token: "T08", patientId: "pat-8", apptType: "Follow-up", time: "12:30 PM", assessmentStatus: "None", status: "No Show" },
-    { id: "q-9", token: "T09", patientId: "pat-9", apptType: "Follow-up", time: "01:00 PM", assessmentStatus: "Done", status: "Scheduled" },
-    { id: "q-10", token: "T10", patientId: "pat-10", apptType: "Follow-up", time: "01:30 PM", assessmentStatus: "Done", status: "Scheduled" }
+    { id: "q-1", token: "T01", patientId: "pat-1", apptType: "New Consultation", time: "09:00 AM", assessmentStatus: "Done", status: "Waiting", date: "2025-07-01" },
+    { id: "q-2", token: "T02", patientId: "pat-2", apptType: "Follow-up", time: "09:30 AM", assessmentStatus: "Done", status: "Waiting", date: "2025-06-24" },
+    { id: "q-3", token: "T03", patientId: "pat-3", apptType: "Follow-up", time: "10:00 AM", assessmentStatus: "Done", status: "Waiting", date: "2025-06-24" },
+    { id: "q-4", token: "T04", patientId: "pat-4", apptType: "New Consultation", time: "10:30 AM", assessmentStatus: "Done", status: "Completed", date: "2025-06-24" },
+    { id: "q-5", token: "T05", patientId: "pat-5", apptType: "Follow-up", time: "11:00 AM", assessmentStatus: "None", status: "Scheduled", date: "2025-06-24" },
+    { id: "q-6", token: "T06", patientId: "pat-6", apptType: "Follow-up", time: "11:30 AM", assessmentStatus: "Done", status: "Completed", date: "2025-06-24" },
+    { id: "q-7", token: "T07", patientId: "pat-7", apptType: "Follow-up", time: "12:00 PM", assessmentStatus: "None", status: "Scheduled", date: "2025-06-24" },
+    { id: "q-8", token: "T08", patientId: "pat-8", apptType: "Follow-up", time: "12:30 PM", assessmentStatus: "None", status: "No Show", date: "2025-06-24" },
+    { id: "q-9", token: "T09", patientId: "pat-9", apptType: "Follow-up", time: "01:00 PM", assessmentStatus: "Done", status: "Scheduled", date: "2025-06-24" },
+    { id: "q-10", token: "T10", patientId: "pat-10", apptType: "Follow-up", time: "01:30 PM", assessmentStatus: "Done", status: "Scheduled", date: "2025-06-24" }
   ],
 
   invoices: [
@@ -477,7 +477,9 @@ const INITIAL_STATE = {
     }
   ],
 
-  activeConsultation: null
+  activeConsultation: null,
+  auditLogs: [],
+  ndpsAuditLogs: []
 };
 
 // --- STATE MANAGER ---
@@ -489,24 +491,103 @@ class StateManager {
 
   loadState() {
     const saved = localStorage.getItem(this.key);
+    let parsed = null;
     if (saved) {
       try {
-        const parsed = JSON.parse(saved);
-        // Force refresh state if patient list count is less than 10 or queue has no Scheduled items (migration step)
-        if (parsed.patients && parsed.patients.length >= 10 && parsed.queue && parsed.queue.some(q => q.status === 'Scheduled')) {
-          if (!parsed.invoices) {
-            parsed.invoices = JSON.parse(JSON.stringify(INITIAL_STATE.invoices));
-            this.saveState(parsed);
-          }
-          return parsed;
+        parsed = JSON.parse(saved);
+        if (!(parsed.patients && parsed.patients.length >= 10 && parsed.queue && parsed.queue.some(q => q.status === 'Scheduled'))) {
+          parsed = null;
         }
       } catch (e) {
-
         console.error("Error parsing saved state, resetting...", e);
       }
     }
-    this.saveState(INITIAL_STATE);
-    return JSON.parse(JSON.stringify(INITIAL_STATE));
+
+    if (!parsed) {
+      parsed = JSON.parse(JSON.stringify(INITIAL_STATE));
+      parsed.patients.forEach(p => {
+        if (p.id === 'pat-1') p.riskTier = "Low-moderate risk";
+        else if (p.id === 'pat-3') p.riskTier = "High risk";
+        else if (p.id === 'pat-10') p.riskTier = "Moderate risk";
+        else p.riskTier = "Low risk";
+      });
+    }
+
+    // Shift 2025 mock dates dynamically to current date
+    const has2025Dates = parsed.queue && parsed.queue.some(q => q.date && q.date.startsWith("2025"));
+    if (has2025Dates) {
+      const baseMockDate = new Date("2025-06-24");
+      const actualToday = new Date();
+      baseMockDate.setHours(12, 0, 0, 0);
+      actualToday.setHours(12, 0, 0, 0);
+      const offsetMs = actualToday.getTime() - baseMockDate.getTime();
+      const offsetDays = Math.round(offsetMs / (1000 * 60 * 60 * 24));
+
+      const shiftDates = (obj) => {
+        if (!obj || typeof obj !== 'object') return;
+        for (let key in obj) {
+          if (obj.hasOwnProperty(key)) {
+            if (key === 'dob') continue;
+            const val = obj[key];
+            if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}/.test(val)) {
+              const parts = val.split(' ');
+              const datePart = parts[0];
+              const timePart = parts.slice(1).join(' ');
+              const dateObj = new Date(datePart);
+              if (!isNaN(dateObj.getTime())) {
+                dateObj.setDate(dateObj.getDate() + offsetDays);
+                const newDatePart = dateObj.toISOString().split('T')[0];
+                obj[key] = timePart ? `${newDatePart} ${timePart}` : newDatePart;
+              }
+            } else if (typeof val === 'object') {
+              shiftDates(val);
+            }
+          }
+        }
+      };
+      shiftDates(parsed);
+    }
+
+    // Ensure all standard migrations (e.g. invoices, auditLogs) are present
+    let modified = false;
+    if (!parsed.invoices) {
+      parsed.invoices = JSON.parse(JSON.stringify(INITIAL_STATE.invoices));
+      modified = true;
+    }
+    if (!parsed.auditLogs) {
+      parsed.auditLogs = [];
+      modified = true;
+    }
+    if (!parsed.ndpsAuditLogs) {
+      parsed.ndpsAuditLogs = [];
+      modified = true;
+    }
+    if (parsed.patients) {
+      parsed.patients.forEach(p => {
+        if (!p.riskTier) {
+          if (p.id === 'pat-1') p.riskTier = "Low-moderate risk";
+          else if (p.id === 'pat-3') p.riskTier = "High risk";
+          else if (p.id === 'pat-10') p.riskTier = "Moderate risk";
+          else p.riskTier = "Low risk";
+          modified = true;
+        }
+      });
+    }
+    if (parsed.queue) {
+      parsed.queue.forEach(q => {
+        if (!q.date) {
+          if (q.id === "q-1" || q.patientId === "pat-1") {
+            q.date = new Date(new Date().setDate(new Date().getDate() + 7)).toISOString().split('T')[0];
+          } else {
+            q.date = new Date().toISOString().split('T')[0];
+          }
+          modified = true;
+        }
+      });
+    }
+
+    this.saveState(parsed);
+    return parsed;
   }
 
   saveState(state) {
@@ -614,19 +695,45 @@ const ASSESSMENT_SPECS = {
 };
 
 // --- MOCK CONSTANTS ---
-const ICD11_DIAGNOSES = [
-  { code: "6A70.0", name: "Major depressive disorder, single episode, mild" },
-  { code: "6A70.1", name: "Major depressive disorder, single episode, moderate" },
-  { code: "6A70.2", name: "Major depressive disorder, single episode, severe without psychotic symptoms" },
-  { code: "6A70.3", name: "Major depressive disorder, single episode, severe with psychotic symptoms" },
-  { code: "6A71.1", name: "Major depressive disorder, recurrent, moderate" },
-  { code: "6B00", name: "Generalized anxiety disorder" },
-  { code: "6B20", name: "Obsessive-compulsive disorder" },
-  { code: "6A60", name: "Bipolar type I disorder" },
-  { code: "6A61", name: "Bipolar type II disorder" },
-  { code: "6A02", name: "Attention deficit hyperactivity disorder" },
-  { code: "6A20", name: "Schizophrenia" },
-  { code: "6C50", name: "Alcohol use disorder" }
+const ICD10_DIAGNOSES = [
+  { code: "F32.0", name: "Depressive episode, mild" },
+  { code: "F32.1", name: "Depressive episode, moderate" },
+  { code: "F32.2", name: "Depressive episode, severe without psychotic symptoms" },
+  { code: "F32.3", name: "Depressive episode, severe with psychotic symptoms" },
+  { code: "F33.0", name: "Recurrent depressive disorder, current episode mild" },
+  { code: "F33.1", name: "Recurrent depressive disorder, current episode moderate" },
+  { code: "F33.2", name: "Recurrent depressive disorder, current episode severe without psychotic symptoms" },
+  { code: "F41.1", name: "Generalised anxiety disorder" },
+  { code: "F41.0", name: "Panic disorder" },
+  { code: "F40.0", name: "Agoraphobia" },
+  { code: "F40.1", name: "Social phobias" },
+  { code: "F42",   name: "Obsessive-compulsive disorder" },
+  { code: "F43.1", name: "Post-traumatic stress disorder" },
+  { code: "F43.2", name: "Adjustment disorder" },
+  { code: "F31.0", name: "Bipolar affective disorder, current episode hypomanic" },
+  { code: "F31.3", name: "Bipolar affective disorder, current episode mild or moderate depression" },
+  { code: "F31.5", name: "Bipolar affective disorder, current episode severe depression with psychotic symptoms" },
+  { code: "F20.0", name: "Paranoid schizophrenia" },
+  { code: "F20.9", name: "Schizophrenia, unspecified" },
+  { code: "F25.0", name: "Schizoaffective disorder, manic type" },
+  { code: "F25.1", name: "Schizoaffective disorder, depressive type" },
+  { code: "F90.0", name: "Disturbance of activity and attention (ADHD)" },
+  { code: "F10.2", name: "Alcohol dependence syndrome" },
+  { code: "F10.1", name: "Harmful use of alcohol" },
+  { code: "F11.2", name: "Opioid dependence" },
+  { code: "F12.2", name: "Cannabis dependence" },
+  { code: "F51.0", name: "Nonorganic insomnia" },
+  { code: "F60.3", name: "Emotionally unstable (Borderline) personality disorder" },
+  { code: "F60.0", name: "Paranoid personality disorder" },
+  { code: "F06.3", name: "Organic mood disorder" },
+  { code: "F06.7", name: "Mild cognitive disorder" },
+  { code: "F00",   name: "Dementia in Alzheimer disease" },
+  { code: "F50.0", name: "Anorexia nervosa" },
+  { code: "F50.2", name: "Bulimia nervosa" },
+  { code: "F84.0", name: "Childhood autism" },
+  { code: "F70",   name: "Mild intellectual disability" },
+  { code: "F45.1", name: "Undifferentiated somatoform disorder" },
+  { code: "F30.1", name: "Mania without psychotic symptoms" }
 ];
 
 const COMMON_MEDS = [
@@ -644,5 +751,5 @@ const COMMON_MEDS = [
 // Exporting core elements
 window.SaronilState = store;
 window.ASSESSMENT_SPECS = ASSESSMENT_SPECS;
-window.ICD11_DIAGNOSES = ICD11_DIAGNOSES;
+window.ICD10_DIAGNOSES = ICD10_DIAGNOSES;
 window.COMMON_MEDS = COMMON_MEDS;
