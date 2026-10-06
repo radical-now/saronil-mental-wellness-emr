@@ -1811,9 +1811,59 @@ body.consultation-room-active .content {
   min-width: 18px;
   text-align: center;
 }
+.pd-left-nav-item.pd-nav-item-stacked {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  padding: 8px 10px !important;
+}
+.pd-left-nav-item.pd-nav-item-stacked .pd-nav-icon {
+  font-size: 14px;
+  line-height: 1.3;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.pd-left-nav-item.pd-nav-item-stacked .pd-nav-text-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+.pd-left-nav-item.pd-nav-item-stacked .pd-nav-title {
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: inherit;
+  word-break: normal;
+}
+.pd-left-nav-item.pd-nav-item-stacked .pd-nav-badge {
+  align-self: flex-start;
+  width: fit-content;
+  font-size: 10px;
+  padding: 1.5px 7px;
+  border-radius: 6px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.2px;
+  margin-top: 1px;
+}
 .pd-main-content {
   flex: 1;
   min-width: 0;
+}
+@keyframes pdSectionFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.pd-section-active {
+  animation: pdSectionFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 .pd-right-timeline {
   width: 320px;
@@ -5509,6 +5559,23 @@ body.consultation-room-active #doc-page-consultation-finalized {
   padding: 10px 10px;
   border-bottom: 1px solid #f1f5f9;
   font-size: 12px;
+}
+
+/* Mental Wellness Modern Row Cards */
+.med-item-row, .doc-item-row {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.med-item-row:hover, .doc-item-row:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+}
+
+.therapy-session {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.therapy-session:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
 }
 
 

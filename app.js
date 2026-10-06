@@ -7,17 +7,17 @@ const INITIAL_STATE = {
     {
         "id": "pat-1",
         "uhid": "SH-2025-001",
-        "name": "Advait Rao",
-        "age": 34,
+        "name": "Rajesh Kumar",
+        "age": 45,
         "gender": "Male",
-        "dob": "1992-05-14",
+        "dob": "1981-05-14",
         "bloodGroup": "B+",
-        "email": "advait.rao@gmail.com",
+        "email": "rajesh.kumar@example.com",
         "mobile": "+91 98765 43210",
         "address": "42/B, 4th Cross, 5th Block, Koramangala, Bengaluru \u2014 560034",
-        "occupation": "Senior Product Manager (on medical leave)",
+        "occupation": "Practising Physician (MBBS, University Gold Medalist)",
         "maritalStatus": "Married",
-        "education": "B.Tech (Computer Science) + MBA (IIM-B)",
+        "education": "MBBS, University Gold Medalist",
         "livingArrangement": "Lives with spouse in owned apartment",
         "substanceHistory": {
             "alcohol": "Occasional / Social (abstinent currently \u00d7 3 months)",
@@ -31,9 +31,9 @@ const INITIAL_STATE = {
             "temp": "98.4 \u00b0F",
             "spo2": "99%",
             "respiratoryRate": "16/min",
-            "weight": "58 kg",
+            "weight": "82 kg",
             "height": "172 cm",
-            "bmi": "19.6 kg/m\u00b2"
+            "bmi": "26.8 kg/m²"
         },
         "vitalsHistory": [
             {
@@ -42,7 +42,7 @@ const INITIAL_STATE = {
                 "pulse": "76 bpm",
                 "temp": "98.6 \u00b0F",
                 "spo2": "99%",
-                "weight": "60.0 kg",
+            "weight": "82 kg",
                 "bmi": "20.3 kg/m\u00b2",
                 "recordedBy": "Nurse Meena"
             },
@@ -68,10 +68,10 @@ const INITIAL_STATE = {
             }
         ],
         "allergies": "No known drug allergies (NKDA). Mild seasonal dust mite rhinitis.",
-        "medicalConditions": "Essential Hypertension (well-managed on Amlodipine 5mg), Subclinical Hypothyroidism (managed on Levothyroxine 25mcg)",
-        "psychiatricHistory": "First major depressive episode. No prior psychiatric hospitalizations or ECT. Treatment-naive for psychotropics prior to current presentation.",
-        "familyHistory": "Paternal father diagnosed with Bipolar I Disorder; Maternal aunt treated for unipolar depression; First cousin with generalized anxiety.",
-        "personalHistory": "Full term normal delivery, achieved normal developmental milestones. High academic achievement. Premorbid traits: High conscientiousness, perfectionism, introverted coping.",
+        "medicalConditions": "Type 2 Diabetes Mellitus (T2DM), Essential Hypertension (HTN), Dyslipidemia / ASCVD",
+        "psychiatricHistory": "Generalized Anxiety Disorder with panic features and somatic hyperarousal. Prior adequate trial of Sertraline.",
+        "familyHistory": "Father: Essential Hypertension (HTN) + Type 2 Diabetes Mellitus (T2DM); Mother: Hypothyroidism with anxious traits; Non-consanguineous marriage.",
+        "personalHistory": "Full term normal delivery (GA 39 wks, 3.1 kg), achieved age-appropriate milestones. MBBS University Gold Medalist, practising physician. Premorbid traits: Perfectionism, high conscientiousness, somatic hyperarousal.",
         "currentMeds": [
             {
                 "id": "m-101",
@@ -317,6 +317,42 @@ const INITIAL_STATE = {
                 ],
                 "hasRecording": true,
                 "recordingTranscript": "[00:01] Doctor: Good morning Advait. I am Dr. Riya Sharma. I understand your sister and wife Sunitha encouraged you to come in today. How can I help you?\n[00:08] Patient: Yes, hello doctor. I have just been feeling really low for the past three months. Ever since I lost my job as a product manager during the layoffs, it feels like everything is falling apart.\n[00:18] Doctor: I am sorry to hear about your job. Can you describe what this low mood feels like on a daily basis?\n[00:25] Patient: It is like being underwater. I wake up around 4 AM every single morning with a heavy feeling in my chest and cannot fall back asleep. I have no interest in doing anything, even things I used to love like cycling.\n[00:37] Doctor: That sounds incredibly heavy and exhausting. Are you experiencing any thoughts of suicide or self-harm?\n[00:44] Patient: Sometimes I just feel like it would be easier if I did not wake up at all. But I don't have any plan or intention to end my life. I think about my sister and Sunitha and know I cannot do that.\n[00:54] Doctor: Thank you for sharing that with me. We call those passive suicidal thoughts. We will take this very seriously, build a safety plan, and start treatment. I recommend Escitalopram 10mg to help stabilize the neurotransmitters, and a referral for Cognitive Behavioral Therapy. How do you feel about that plan?\n[01:10] Patient: I am open to anything that helps. I just want to feel like myself again.\n[01:16] Doctor: Absolutely. We will take this step by step. We will start with a weekly check-in."
+            },
+            {
+                "id": "consult-2",
+                "date": "2025-07-08",
+                "time": "11:00 AM",
+                "duration": "30 min",
+                "type": "2-Week Psychiatric Review & Pharmacotherapy Follow-up",
+                "doctor": "Dr. Riya Sharma",
+                "location": "In-person · Room 204",
+                "complaints": [
+                    "Follow-up evaluation at 2 weeks",
+                    "Significant improvement in 4 AM early awakening",
+                    "Mild morning grogginess mitigating after 9 AM",
+                    "Anhedonia improving; resumed light recreational cycling"
+                ],
+                "notes": "Patient attended scheduled 14-day medication follow-up accompanied by spouse Sunitha. High pharmacotherapy adherence (98%). Transient Day 1-4 nausea completely resolved. Significant vegetative improvement with total sleep time expanded to 6.5 hours. Passive suicidal ideation on PHQ-9 Q9 fully resolved (Score 0). Initiated planned taper of Clonazepam 0.5mg to 0.25mg for 7 days then discontinue. Advised continuation of Escitalopram 10mg OD night and weekly CBT with Dr. Sneha Patil.",
+                "diagnosis": "Major Depressive Disorder, Single Episode, Moderate-Severe — In Early Partial Remission (ICD-11: 6A70.1 / ICD-10: F32.1)",
+                "mse": [
+                    { "key": "Appearance", "val": "Neatly groomed, brighter affect, spontaneous warm smile", "isGood": true },
+                    { "key": "Psychomotor Activity", "val": "Normal psychomotor activity, responsive posture", "isGood": true },
+                    { "key": "Speech", "val": "Spontaneous, normal rate, volume, and latency", "isGood": true },
+                    { "key": "Mood & Affect", "val": "Mood 'much lighter, feeling hopeful', Affect reactive and congruent", "isGood": true },
+                    { "key": "Thought Content", "val": "Constructive focus on routine and career pivot; denies death wishes or self-harm", "isGood": true },
+                    { "key": "Perception", "val": "No perceptual disturbances or hallucinations", "isGood": true },
+                    { "key": "Cognitive / Insight", "val": "Alert, oriented ×3, concentration normal on Serial 7s, Insight Grade 6/6 (Full insight)", "isGood": true }
+                ],
+                "risk": "Low Acute Risk · High Protective Factors (Active spouse engagement, CBT underway, job search re-engaged). Passive suicidal ideation completely remitted.",
+                "treatment": "1. Continue Tab. Escitalopram 10mg OD Night. 2. Taper Tab. Clonazepam to 0.25mg HS × 7 days then stop completely. 3. Continue weekly CBT with Dr. Sneha Patil (Session 4 scheduled). 4. Continue Cap. Cholecalciferol 60k IU weekly (Course Week 3/8). 5. Re-evaluate in 4 weeks.",
+                "badges": [
+                    "Partial Remission",
+                    "Clonazepam Taper",
+                    "SI Resolved",
+                    "CBT Ongoing"
+                ],
+                "hasRecording": true,
+                "recordingTranscript": "[00:01] Doctor: Welcome back Advait. It is wonderful to see you looking more energetic and alert today. How has the past fortnight been since our initial evaluation and starting Escitalopram?\n[00:09] Patient: Hello Dr. Sharma. It has actually been much better. The initial nausea went away after about four days, and I am finally sleeping past 6 AM instead of waking up in a panic at 4 AM.\n[00:20] Doctor: That is tremendous clinical progress. How are the mornings feeling with the Clonazepam?\n[00:25] Patient: A bit sluggish until around 9 AM, but quite manageable. Sunitha and I have kept all medications in the lockbox as we planned.\n[00:32] Doctor: Excellent adherence. Because you have now completed the initial 14 days, we will taper the Clonazepam down to half a tablet (0.25mg) at bedtime for one week, and then discontinue it completely. We will maintain Escitalopram at 10mg.\n[00:46] Patient: That sounds very reassuring doctor. My CBT sessions with Dr. Sneha Patil have also really helped me start cycling again and updating my resume.\n[00:55] Doctor: That is fantastic. Keep up the behavioral activation, and we will do our next psychiatric check-in in 4 weeks."
             }
         ]
     },
